@@ -1,0 +1,29 @@
+bazel_dep(name = "rules_dotnet", version = "0.19.2")
+
+dotnet = use_extension("@rules_dotnet//dotnet:extensions.bzl", "dotnet")
+dotnet.toolchain(dotnet_version = "8.0.200")
+use_repo(dotnet, "dotnet_toolchains")
+
+register_toolchains("@dotnet_toolchains//:all")
+
+paket2bazel_dependencies = use_extension("@rules_dotnet//dotnet:paket2bazel_dependencies.bzl", "paket2bazel_dependencies")
+
+main_extension = use_extension("//dependencies/nuget:paket.main_extension.bzl", "main_extension")
+use_repo(main_extension, "paket.main")
+
+#bazel_dep(name = "dependencies", version = "1.0");
+#local_path_override(
+#    module_name = "dependencies",
+#    path = "dependencies"
+#)
+
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+http_archive(
+    name = "SoulsFormats",
+    url = "https://github.com/JKAnderson/SoulsFormats/archive/9c0da6b0721372b34f36b4be503ec020dca1043a.tar.gz",
+    sha256 = "0c5e96a648781dabfd093d4d524cff97517875ce6aa5bb81701ad55c91362ff3",
+	build_file = "@//dependencies:SoulsFormats.BUILD",
+	patches = ["@//dependencies/patches:shift-jis.patch"],
+	patch_args = ["-p1"],
+	strip_prefix = "SoulsFormats-9c0da6b0721372b34f36b4be503ec020dca1043a"
+)
