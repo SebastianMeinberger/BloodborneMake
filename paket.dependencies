@@ -1,3 +1,4 @@
 source https://api.nuget.org/v3/index.json
 
 nuget ZstdSharp.Port
+nuget Antlr4.Runtime.Standard = 4.9.2

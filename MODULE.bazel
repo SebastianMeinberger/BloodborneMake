@@ -1,3 +1,4 @@
+# Dotnet + nuget
 bazel_dep(name = "rules_dotnet", version = "0.19.2")
 
 dotnet = use_extension("@rules_dotnet//dotnet:extensions.bzl", "dotnet")
@@ -11,12 +12,7 @@ paket2bazel_dependencies = use_extension("@rules_dotnet//dotnet:paket2bazel_depe
 main_extension = use_extension("//dependencies/nuget:paket.main_extension.bzl", "main_extension")
 use_repo(main_extension, "paket.main")
 
-#bazel_dep(name = "dependencies", version = "1.0");
-#local_path_override(
-#    module_name = "dependencies",
-#    path = "dependencies"
-#)
-
+# SoulsFormats
 http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 http_archive(
     name = "SoulsFormats",

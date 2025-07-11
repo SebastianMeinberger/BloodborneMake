@@ -1,0 +1,73 @@
+diff --git a/antlr/antlr4.bzl b/antlr/antlr4.bzl
+index a351ab4..ff4a14d 100644
+--- a/antlr/antlr4.bzl
++++ b/antlr/antlr4.bzl
+@@ -8,8 +8,8 @@ load(
+ 
+ def imports(folder):
+     """Returns the grammar and token files found below the given lib directory."""
+-    return (native.glob(["{0}/*.g4".format(folder)], allow_empty = True) +
+-            native.glob(["{0}/*.tokens".format(folder)], allow_empty = True))
++    return (native.glob(["{0}/*.g4".format(folder)], allow_empty = True))# +
++#            native.glob(["{0}/*.tokens".format(folder)], allow_empty = True))
+ 
+ def _generate(ctx):
+     return _antlr("4", ctx, _args)
+@@ -115,3 +115,4 @@ you need to use a different version, you can specify the dependencies here.
+         ),
+     },
+ )
++
+diff --git a/antlr/impl.bzl b/antlr/impl.bzl
+index 2e910a3..9433f13 100644
+--- a/antlr/impl.bzl
++++ b/antlr/impl.bzl
+@@ -1,6 +1,6 @@
+ """The common ANTLR rule implementation."""
+ 
+-load(":lang.bzl", "C", "CPP", "GO", "OBJC", "PYTHON", "PYTHON2", "PYTHON3")
++load(":lang.bzl", "C", "CPP", "GO", "OBJC", "PYTHON", "PYTHON2", "PYTHON3", "CSHARP")
+ 
+ AntlrInfo = provider(
+     fields = {
+@@ -41,8 +41,9 @@ def antlr(version, ctx, args):
+         outputs = [srcjar]
+     else:
+         # for all other languages we use directories
+-        sources = ctx.actions.declare_directory(ctx.attr.name + extension(ctx.attr.language))
+-        output_dir = sources.path
++        #sources = ctx.actions.declare_directory(ctx.attr.name + extension(ctx.attr.language))
++        #print(ctx.attr.language)
++        output_dir = "bazel-out/k8-fastbuild/bin/src/antlr/genESDParser.cs"
+ 
+         # for C/C++ we must split headers from sources
+         if cc:
+@@ -52,6 +53,19 @@ def antlr(version, ctx, args):
+         elif ctx.attr.language == GO:
+             data = [ctx.actions.declare_directory(ctx.attr.name + ".antlr")]
+             outputs = [sources]
++        elif ctx.attr.language == CSHARP:
++            outputs = []
++            for src in ctx.attr.srcs:
++                print(src)
++                file = src[DefaultInfo].files.to_list()[0]
++                file_name = file.basename.rsplit(".", 1)[0]
++                outputs += [ctx.actions.declare_file(ctx.attr.name + extension(ctx.attr.language) + "/" + file_name + ".cs")]
++                if file_name.find("Parser") > -1 or file_name.find("parser") > -1:
++                    print(file_name)
++                    outputs += [ctx.actions.declare_file(ctx.attr.name + extension(ctx.attr.language) + "/" + file_name + "BaseListener.cs")]
++                    outputs += [ctx.actions.declare_file(ctx.attr.name + extension(ctx.attr.language) + "/" + file_name + "Listener.cs")]
++
++
+         else:
+             outputs = [sources]
+ 
+@@ -110,6 +124,8 @@ def extension(language):
+         return ".objc"
+     if language == PYTHON or language == PYTHON2 or language == PYTHON3:
+         return "_py"
++    if language == CSHARP:
++        return ".cs"
+     return ""
+ 
+ def lib_dir(imports):

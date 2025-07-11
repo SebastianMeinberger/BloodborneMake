@@ -1,0 +1,14 @@
+#ANTLR
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "rules_antlr",
+    sha256 = "6ff640eae77cbc405fdb022e491afd790dc633540dd36c1c98d9b92523723242",
+    strip_prefix = "rules_antlr-38bb432711ef716ed995af93d3ff7c6850d1edf7",
+    urls = ["https://github.com/albertocavalcante/rules_antlr/archive/38bb432711ef716ed995af93d3ff7c6850d1edf7.tar.gz"],
+	patches = ["@//dependencies/patches:csharp_support.patch"],
+	patch_args = ["-p1"],	
+)
+
+load("@rules_antlr//antlr:repositories.bzl", "rules_antlr_dependencies")
+rules_antlr_dependencies("4.9.2")
